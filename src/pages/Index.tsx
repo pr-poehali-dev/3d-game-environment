@@ -9,6 +9,7 @@ const Index = () => {
   const [controls, setControls] = useState({ forward: false, backward: false, left: false, right: false });
   const [selectedObject, setSelectedObject] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [gameTime, setGameTime] = useState({ hours: 9, minutes: 0 });
   const touchStartRef = useRef({ x: 0, y: 0 });
   const lastTouchRef = useRef({ x: 0, y: 0 });
 
@@ -197,13 +198,7 @@ const Index = () => {
     chair.userData = { name: 'Кресло-трудяги' };
     scene.add(chair);
 
-    const infoStandGeometry = new THREE.BoxGeometry(0.3, 2, 0.8);
-    const infoStandMaterial = new THREE.MeshStandardMaterial({ color: 0x90ee90 });
-    const infoStand = new THREE.Mesh(infoStandGeometry, infoStandMaterial);
-    infoStand.position.set(4, 1, -1);
-    infoStand.castShadow = true;
-    infoStand.userData = { name: 'ПримМолк (информ. стойка)' };
-    scene.add(infoStand);
+
 
     const posterGeometry = new THREE.BoxGeometry(1.2, 1.5, 0.05);
     const posterMaterial = new THREE.MeshStandardMaterial({ color: 0xff6347 });
@@ -237,19 +232,6 @@ const Index = () => {
     scene.add(rightGatePost2);
 
     const textureLoader = new THREE.TextureLoader();
-    const entranceSignMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-    const entranceSign = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.2, 0.05), entranceSignMaterial);
-    entranceSign.position.set(0, 1.8, 3.5);
-    entranceSign.userData = { name: 'Примерочная (надпись)' };
-    scene.add(entranceSign);
-
-    const exitArrowGeometry = new THREE.ConeGeometry(0.15, 0.4, 3);
-    const exitArrowMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-    const exitArrow = new THREE.Mesh(exitArrowGeometry, exitArrowMaterial);
-    exitArrow.position.set(5, 1.6, 3.5);
-    exitArrow.rotation.z = -Math.PI / 2;
-    exitArrow.userData = { name: 'Стрелка выхода' };
-    scene.add(exitArrow);
 
     const bluePosterTexture = textureLoader.load('https://cdn.poehali.dev/files/12ecfb23-88b7-4cb7-9acd-0b2c5fca274c.jpeg');
     const bluePosterMaterial = new THREE.MeshStandardMaterial({ map: bluePosterTexture });
@@ -263,6 +245,152 @@ const Index = () => {
     wallPoster.position.set(-5.9, 1.5, -2);
     wallPoster.userData = { name: 'Синяя табличка на стене' };
     scene.add(wallPoster);
+
+    const roadGeometry = new THREE.PlaneGeometry(8, 40);
+    const roadMaterial = new THREE.MeshStandardMaterial({ color: 0x3d3d3d });
+    const road = new THREE.Mesh(roadGeometry, roadMaterial);
+    road.rotation.x = -Math.PI / 2;
+    road.position.set(0, 0.01, 15);
+    road.receiveShadow = true;
+    scene.add(road);
+
+    const sidewalkLeft = new THREE.Mesh(
+      new THREE.PlaneGeometry(3, 40),
+      new THREE.MeshStandardMaterial({ color: 0x808080 })
+    );
+    sidewalkLeft.rotation.x = -Math.PI / 2;
+    sidewalkLeft.position.set(-5.5, 0.05, 15);
+    sidewalkLeft.receiveShadow = true;
+    scene.add(sidewalkLeft);
+
+    const sidewalkRight = new THREE.Mesh(
+      new THREE.PlaneGeometry(3, 40),
+      new THREE.MeshStandardMaterial({ color: 0x808080 })
+    );
+    sidewalkRight.rotation.x = -Math.PI / 2;
+    sidewalkRight.position.set(5.5, 0.05, 15);
+    sidewalkRight.receiveShadow = true;
+    scene.add(sidewalkRight);
+
+    const grassArea = new THREE.Mesh(
+      new THREE.PlaneGeometry(20, 40),
+      new THREE.MeshStandardMaterial({ color: 0x7a9b5f })
+    );
+    grassArea.rotation.x = -Math.PI / 2;
+    grassArea.position.set(-15, 0.02, 15);
+    scene.add(grassArea);
+
+    const buildingMaterial = new THREE.MeshStandardMaterial({ color: 0xe0d8c8 });
+    const building1 = new THREE.Mesh(new THREE.BoxGeometry(10, 15, 8), buildingMaterial);
+    building1.position.set(-20, 7.5, 10);
+    building1.castShadow = true;
+    building1.receiveShadow = true;
+    building1.userData = { name: 'Жилой дом напротив' };
+    scene.add(building1);
+
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 3; j++) {
+        const windowGeometry = new THREE.BoxGeometry(1, 1.2, 0.1);
+        const windowMaterial = new THREE.MeshStandardMaterial({ color: 0x87ceeb, emissive: 0x4682b4, emissiveIntensity: 0.3 });
+        const windowMesh = new THREE.Mesh(windowGeometry, windowMaterial);
+        windowMesh.position.set(-20 + (i - 1.5) * 2.2, 3 + j * 3.5, 14.05);
+        scene.add(windowMesh);
+      }
+    }
+
+    const buildingMaterial2 = new THREE.MeshStandardMaterial({ color: 0xc8c0b0 });
+    const building2 = new THREE.Mesh(new THREE.BoxGeometry(8, 12, 8), buildingMaterial2);
+    building2.position.set(-20, 6, 22);
+    building2.castShadow = true;
+    building2.receiveShadow = true;
+    scene.add(building2);
+
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        const windowMesh = new THREE.Mesh(
+          new THREE.BoxGeometry(1, 1.2, 0.1),
+          new THREE.MeshStandardMaterial({ color: 0x87ceeb, emissive: 0x4682b4, emissiveIntensity: 0.3 })
+        );
+        windowMesh.position.set(-20 + (i - 1) * 2.2, 3 + j * 3, 26.05);
+        scene.add(windowMesh);
+      }
+    }
+
+    for (let i = 0; i < 5; i++) {
+      const tree = new THREE.Group();
+      const trunk = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.2, 0.3, 2),
+        new THREE.MeshStandardMaterial({ color: 0x654321 })
+      );
+      trunk.position.y = 1;
+      tree.add(trunk);
+
+      const leaves = new THREE.Mesh(
+        new THREE.SphereGeometry(1, 8, 8),
+        new THREE.MeshStandardMaterial({ color: 0x228b22 })
+      );
+      leaves.position.y = 2.5;
+      tree.add(leaves);
+
+      tree.position.set(-13 + i * 3, 0, 8 + i * 4);
+      tree.castShadow = true;
+      scene.add(tree);
+    }
+
+    const truckGroup = new THREE.Group();
+    const truckBody = new THREE.Mesh(
+      new THREE.BoxGeometry(2, 1.5, 4),
+      new THREE.MeshStandardMaterial({ color: 0x0066ff })
+    );
+    truckBody.position.set(0, 1, 0);
+    truckBody.castShadow = true;
+    truckGroup.add(truckBody);
+
+    const truckCabin = new THREE.Mesh(
+      new THREE.BoxGeometry(2, 1.2, 1.5),
+      new THREE.MeshStandardMaterial({ color: 0x0055cc })
+    );
+    truckCabin.position.set(0, 1.1, -2.5);
+    truckCabin.castShadow = true;
+    truckGroup.add(truckCabin);
+
+    const truckCargo = new THREE.Mesh(
+      new THREE.BoxGeometry(1.8, 1.8, 3.5),
+      new THREE.MeshStandardMaterial({ color: 0xcccccc })
+    );
+    truckCargo.position.set(0, 1.2, 0.8);
+    truckCargo.castShadow = true;
+    truckGroup.add(truckCargo);
+
+    const wheelGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.3, 16);
+    const wheelMaterial = new THREE.MeshStandardMaterial({ color: 0x1a1a1a });
+    
+    for (let i = 0; i < 4; i++) {
+      const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+      wheel.rotation.z = Math.PI / 2;
+      wheel.position.set(i < 2 ? -1.1 : 1.1, 0.4, i % 2 === 0 ? -2 : 1.5);
+      wheel.castShadow = true;
+      truckGroup.add(wheel);
+    }
+
+    const driverGeometry = new THREE.CapsuleGeometry(0.3, 1, 8, 16);
+    const driverMaterial = new THREE.MeshStandardMaterial({ color: 0xffdbac });
+    const driver = new THREE.Mesh(driverGeometry, driverMaterial);
+    driver.position.set(0, 1, 0);
+    driver.castShadow = true;
+
+    truckGroup.position.set(3, 0, 25);
+    truckGroup.visible = false;
+    scene.add(truckGroup);
+
+    const truckState = 'waiting';
+    const truckTimer = 0;
+    const deliverySchedule = [
+      { time: 10 * 60, duration: 5 },
+      { time: 11 * 60, duration: 10 },
+      { time: 12 * 60, duration: 5 },
+      { time: 13 * 60, duration: 3 }
+    ];
 
     const velocity = new THREE.Vector3();
     const direction = new THREE.Vector3();
@@ -369,7 +497,77 @@ const Index = () => {
       camera.position.add(velocity.multiplyScalar(moveSpeed * delta));
       camera.position.y = 1.6;
       camera.position.x = Math.max(-5.5, Math.min(11.5, camera.position.x));
-      camera.position.z = Math.max(-4.5, Math.min(4.5, camera.position.z));
+      camera.position.z = Math.max(-4.5, Math.min(25, camera.position.z));
+
+      truckTimer += delta;
+      if (truckTimer >= 2) {
+        truckTimer = 0;
+        setGameTime(prev => {
+          let newMinutes = prev.minutes + 1;
+          let newHours = prev.hours;
+          if (newMinutes >= 60) {
+            newMinutes = 0;
+            newHours = prev.hours + 1;
+            if (newHours >= 24) newHours = 0;
+          }
+          return { hours: newHours, minutes: newMinutes };
+        });
+      }
+
+      const currentGameMinutes = gameTime.hours * 60 + gameTime.minutes;
+      let shouldShowTruck = false;
+      let activeDuration = 0;
+
+      for (const delivery of deliverySchedule) {
+        if (currentGameMinutes >= delivery.time && currentGameMinutes < delivery.time + delivery.duration) {
+          shouldShowTruck = true;
+          activeDuration = delivery.duration;
+          break;
+        }
+      }
+
+      if (shouldShowTruck && !truckGroup.visible) {
+        truckState = 'arriving';
+        truckGroup.visible = true;
+        truckGroup.position.set(3, 0, 35);
+      }
+
+      if (truckState === 'arriving') {
+        truckGroup.position.z -= delta * 3;
+        if (truckGroup.position.z <= 13) {
+          truckState = 'unloading';
+          truckGroup.position.z = 13;
+        }
+      } else if (truckState === 'unloading') {
+        const elapsed = currentGameMinutes - deliverySchedule.find(d => currentGameMinutes >= d.time && currentGameMinutes < d.time + d.duration)!.time;
+        if (elapsed >= activeDuration - 1) {
+          truckState = 'leaving';
+        }
+        
+        if (!driver.parent) {
+          truckGroup.add(driver);
+          driver.position.set(-2, 1, 0);
+        }
+        
+        const walkCycle = Math.sin(Date.now() * 0.005) * 0.1;
+        if (elapsed < activeDuration / 2) {
+          driver.position.x = Math.max(-2 + elapsed * 0.5, 8);
+          driver.position.y = 1 + walkCycle;
+        }
+      } else if (truckState === 'leaving') {
+        if (driver.parent) {
+          truckGroup.remove(driver);
+        }
+        truckGroup.position.z += delta * 3;
+        if (truckGroup.position.z >= 35) {
+          truckGroup.visible = false;
+          truckState = 'waiting';
+        }
+      }
+
+      if (!shouldShowTruck && truckGroup.visible && truckState === 'waiting') {
+        truckGroup.visible = false;
+      }
 
       renderer.render(scene, camera);
     };
@@ -426,6 +624,19 @@ const Index = () => {
   return (
     <div className="relative w-full h-screen overflow-hidden">
       <div ref={mountRef} className="w-full h-full" />
+      
+      {isLocked && (
+        <div className="absolute top-4 right-4">
+          <Card className="p-3 bg-[#1A1F2C]/95 border-[#9b87f5]">
+            <div className="flex items-center gap-2">
+              <Icon name="Clock" size={20} className="text-[#9b87f5]" />
+              <span className="text-white font-mono text-lg">
+                {String(gameTime.hours).padStart(2, '0')}:{String(gameTime.minutes).padStart(2, '0')}
+              </span>
+            </div>
+          </Card>
+        </div>
+      )}
       
       {!isLocked && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
