@@ -500,15 +500,15 @@ const Index = () => {
       camera.position.z = Math.max(-4.5, Math.min(25, camera.position.z));
 
       truckTimer += delta;
-      if (truckTimer >= 2) {
+      if (truckTimer >= 12) {
         truckTimer = 0;
         setGameTime(prev => {
-          let newMinutes = prev.minutes + 1;
+          let newMinutes = prev.minutes + 5;
           let newHours = prev.hours;
           if (newMinutes >= 60) {
-            newMinutes = 0;
-            newHours = prev.hours + 1;
-            if (newHours >= 24) newHours = 0;
+            newHours += Math.floor(newMinutes / 60);
+            newMinutes = newMinutes % 60;
+            if (newHours >= 24) newHours = newHours % 24;
           }
           return { hours: newHours, minutes: newMinutes };
         });
