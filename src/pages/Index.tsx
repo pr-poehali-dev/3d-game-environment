@@ -9,8 +9,7 @@ const Index = () => {
   const canvasRef = useRef<HTMLElement | null>(null);
   const [isLocked, setIsLocked] = useState(false);
   const [controls, setControls] = useState({ forward: false, backward: false, left: false, right: false });
-  const [selectedObject, setSelectedObject] = useState<string | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile] = useState(true);
   const [gameTime, setGameTime] = useState({ hours: 9, minutes: 0 });
   const [money, setMoney] = useState(0);
   const [joystickX, setJoystickX] = useState(0);
@@ -18,15 +17,6 @@ const Index = () => {
   
   const mouseXRef = useRef(0);
   const mouseYRef = useRef(0);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   useEffect(() => {
     if (mountRef.current) {
@@ -52,13 +42,9 @@ const Index = () => {
     isLocked,
     setIsLocked,
     setControls,
-    setSelectedObject,
     mouseXRef,
     mouseYRef,
     rendererRef: canvasRef,
-    scene,
-    camera,
-    isMobile,
     joystickX,
     joystickY
   });
@@ -74,13 +60,11 @@ const Index = () => {
       
       <GameUI 
         isLocked={isLocked}
-        selectedObject={selectedObject}
         gameTime={gameTime}
         money={money}
-        isMobile={isMobile}
       />
 
-      {isMobile && isLocked && (
+      {isLocked && (
         <MobileControls onJoystickMove={handleJoystickMove} />
       )}
     </div>
