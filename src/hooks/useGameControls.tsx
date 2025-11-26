@@ -11,6 +11,9 @@ interface GameControlsProps {
   rendererRef: React.MutableRefObject<HTMLElement | null>;
   scene: THREE.Scene | null;
   camera: THREE.Camera | null;
+  isMobile: boolean;
+  joystickX: number;
+  joystickY: number;
 }
 
 export const useGameControls = ({
@@ -22,10 +25,14 @@ export const useGameControls = ({
   mouseYRef,
   rendererRef,
   scene,
-  camera
+  camera,
+  isMobile,
+  joystickX,
+  joystickY
 }: GameControlsProps) => {
   const touchStartRef = useRef({ x: 0, y: 0 });
   const lastTouchRef = useRef({ x: 0, y: 0 });
+  const cameraSwipeAreaRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     if (!rendererRef.current) return;
@@ -60,42 +67,59 @@ export const useGameControls = ({
       if (!scene || !camera) return;
       
       if (!isLocked) {
-        rendererRef.current?.requestPointerLock();
+        if (!isMobile) {
+          rendererRef.current?.requestPointerLock();
+        }
         setIsLocked(true);
         return;
       }
 
-      const mouse = new THREE.Vector2();
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      if (!isMobile) {
+        const mouse = new THREE.Vector2();
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-      const raycaster = new THREE.Raycaster();
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(scene.children);
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(scene.children);
 
-      if (intersects.length > 0 && intersects[0].object.userData.name) {
-        setSelectedObject(intersects[0].object.userData.name);
+        if (intersects.length > 0 && intersects[0].object.userData.name) {
+          setSelectedObject(intersects[0].object.userData.name);
+        }
       }
     };
 
     const onTouchStart = (event: TouchEvent) => {
       if (event.touches.length === 1) {
-        touchStartRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
-        lastTouchRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+        const touch = event.touches[0];
+        const x = touch.clientX;
+        const y = touch.clientY;
+        
+        if (x > window.innerWidth * 0.6) {
+          cameraSwipeAreaRef.current = { x, y };
+        }
+        
+        touchStartRef.current = { x, y };
+        lastTouchRef.current = { x, y };
       }
     };
 
     const onTouchMove = (event: TouchEvent) => {
-      if (event.touches.length === 1 && isLocked) {
+      if (event.touches.length === 1 && isLocked && isMobile) {
         const touch = event.touches[0];
-        const deltaX = touch.clientX - lastTouchRef.current.x;
-        const deltaY = touch.clientY - lastTouchRef.current.y;
+        const x = touch.clientX;
+        const y = touch.clientY;
         
-        mouseXRef.current += deltaX * 0.003;
-        mouseYRef.current += deltaY * 0.003;
-        mouseYRef.current = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, mouseYRef.current));
+        if (x > window.innerWidth * 0.6) {
+          const deltaX = x - lastTouchRef.current.x;
+          const deltaY = y - lastTouchRef.current.y;
+          
+          mouseXRef.current += deltaX * 0.005;
+          mouseYRef.current += deltaY * 0.005;
+          mouseYRef.current = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, mouseYRef.current));
+        }
         
-        lastTouchRef.current = { x: touch.clientX, y: touch.clientY };
+        lastTouchRef.current = { x, y };
       }
     };
 
@@ -122,5 +146,17 @@ export const useGameControls = ({
         rendererRef.current.removeEventListener('touchmove', onTouchMove);
       }
     };
-  }, [isLocked, setIsLocked, setControls, setSelectedObject, mouseXRef, mouseYRef, rendererRef, scene, camera]);
+  }, [isLocked, setIsLocked, setControls, setSelectedObject, mouseXRef, mouseYRef, rendererRef, scene, camera, isMobile]);
+
+  useEffect(() => {
+    if (isMobile && isLocked) {
+      const threshold = 0.1;
+      setControls({
+        forward: joystickY > threshold,
+        backward: joystickY < -threshold,
+        left: joystickX < -threshold,
+        right: joystickX > threshold
+      });
+    }
+  }, [joystickX, joystickY, isMobile, isLocked, setControls]);
 };
