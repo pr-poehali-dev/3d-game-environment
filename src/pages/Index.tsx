@@ -15,7 +15,7 @@ const Index = () => {
   const [joystickX, setJoystickX] = useState(0);
   const [joystickY, setJoystickY] = useState(0);
   
-  const mouseXRef = useRef(0);
+  const mouseXRef = useRef(Math.PI);
   const mouseYRef = useRef(0);
 
   useEffect(() => {
@@ -55,6 +55,8 @@ const Index = () => {
   };
 
   const handleStartGame = () => {
+    mouseXRef.current = Math.PI;
+    mouseYRef.current = 0;
     setIsLocked(true);
   };
 
