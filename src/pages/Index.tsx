@@ -84,11 +84,95 @@ const Index = () => {
     leftWall.userData = { name: 'Стол (стенка слева)' };
     scene.add(leftWall);
 
-    const rightWallGeometry = new THREE.BoxGeometry(0.2, 3, 10);
-    const rightWall = new THREE.Mesh(rightWallGeometry, wallMaterial);
-    rightWall.position.set(6, 1.5, 0);
-    rightWall.receiveShadow = true;
-    scene.add(rightWall);
+    const rightWallPart1 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 3, 4), wallMaterial);
+    rightWallPart1.position.set(6, 1.5, -3);
+    rightWallPart1.receiveShadow = true;
+    scene.add(rightWallPart1);
+
+    const rightWallPart2 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 3, 3), wallMaterial);
+    rightWallPart2.position.set(6, 1.5, 3.5);
+    rightWallPart2.receiveShadow = true;
+    scene.add(rightWallPart2);
+
+    const curtainGeometry = new THREE.PlaneGeometry(1.8, 2.5);
+    const curtainMaterial = new THREE.MeshStandardMaterial({ 
+      color: 0x1a1a1a,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.9
+    });
+    const curtain = new THREE.Mesh(curtainGeometry, curtainMaterial);
+    curtain.position.set(5.9, 1.25, 0.5);
+    curtain.rotation.y = Math.PI / 2;
+    curtain.userData = { name: 'Чёрная занавеска → Склад' };
+    scene.add(curtain);
+
+    const warehouseWallMaterial = new THREE.MeshStandardMaterial({ color: 0x3a3a3a });
+    
+    const warehouseFrontWall = new THREE.Mesh(new THREE.BoxGeometry(0.2, 3, 8), warehouseWallMaterial);
+    warehouseFrontWall.position.set(6.1, 1.5, 0.5);
+    warehouseFrontWall.receiveShadow = true;
+    scene.add(warehouseFrontWall);
+
+    const warehouseBackWall = new THREE.Mesh(new THREE.BoxGeometry(6, 3, 0.2), warehouseWallMaterial);
+    warehouseBackWall.position.set(9, 1.5, 4.4);
+    warehouseBackWall.receiveShadow = true;
+    scene.add(warehouseBackWall);
+
+    const warehouseRightWall = new THREE.Mesh(new THREE.BoxGeometry(0.2, 3, 8), warehouseWallMaterial);
+    warehouseRightWall.position.set(12, 1.5, 0.5);
+    warehouseRightWall.receiveShadow = true;
+    scene.add(warehouseRightWall);
+
+    const warehouseLeftWall = new THREE.Mesh(new THREE.BoxGeometry(6, 3, 0.2), warehouseWallMaterial);
+    warehouseLeftWall.position.set(9, 1.5, -3.4);
+    warehouseLeftWall.receiveShadow = true;
+    scene.add(warehouseLeftWall);
+
+    const warehouseFloor = new THREE.Mesh(
+      new THREE.PlaneGeometry(6, 8),
+      new THREE.MeshStandardMaterial({ color: 0x505050 })
+    );
+    warehouseFloor.rotation.x = -Math.PI / 2;
+    warehouseFloor.position.set(9, 0, 0.5);
+    warehouseFloor.receiveShadow = true;
+    warehouseFloor.userData = { name: 'Пол склада' };
+    scene.add(warehouseFloor);
+
+    const warehouseCeiling = new THREE.Mesh(
+      new THREE.PlaneGeometry(6, 8),
+      new THREE.MeshStandardMaterial({ color: 0x4a4a4a, side: THREE.DoubleSide })
+    );
+    warehouseCeiling.rotation.x = Math.PI / 2;
+    warehouseCeiling.position.set(9, 3, 0.5);
+    scene.add(warehouseCeiling);
+
+    const warehouseLight = new THREE.PointLight(0xffa500, 0.8, 15);
+    warehouseLight.position.set(9, 2.5, 0.5);
+    warehouseLight.castShadow = true;
+    scene.add(warehouseLight);
+
+    const boxMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+    
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 2; j++) {
+        const box = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), boxMaterial);
+        box.position.set(7.5 + i * 0.7, 0.3 + j * 0.65, 2);
+        box.castShadow = true;
+        box.userData = { name: `Коробка ${i + 1}-${j + 1}` };
+        scene.add(box);
+      }
+    }
+
+    for (let i = 0; i < 2; i++) {
+      for (let j = 0; j < 3; j++) {
+        const box = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), boxMaterial);
+        box.position.set(10.5 + i * 0.7, 0.3 + j * 0.65, -1);
+        box.castShadow = true;
+        box.userData = { name: `Коробка стек ${i + 1}-${j + 1}` };
+        scene.add(box);
+      }
+    }
 
     const receptionDeskGeometry = new THREE.BoxGeometry(3, 1.2, 1.5);
     const receptionDeskMaterial = new THREE.MeshStandardMaterial({ color: 0xe0e0e0 });
@@ -284,7 +368,7 @@ const Index = () => {
       
       camera.position.add(velocity.multiplyScalar(moveSpeed * delta));
       camera.position.y = 1.6;
-      camera.position.x = Math.max(-5.5, Math.min(5.5, camera.position.x));
+      camera.position.x = Math.max(-5.5, Math.min(11.5, camera.position.x));
       camera.position.z = Math.max(-4.5, Math.min(4.5, camera.position.z));
 
       renderer.render(scene, camera);
