@@ -472,13 +472,23 @@ export const useGameScene = ({
       if (direction.z !== 0) velocity.add(forward.multiplyScalar(direction.z));
       if (direction.x !== 0) velocity.add(right.multiplyScalar(direction.x));
       
-      const newPosition = camera.position.clone().add(velocity.multiplyScalar(moveSpeed * delta));
-      newPosition.y = 1.6;
-      
-      if (newPosition.x >= -5.5 && newPosition.x <= 11.5 && 
-          newPosition.z >= -4.5 && newPosition.z <= 4.5) {
-        camera.position.copy(newPosition);
+      if (velocity.length() > 0) {
+        velocity.normalize();
+        const movement = velocity.multiplyScalar(moveSpeed * delta);
+        
+        const newX = camera.position.x + movement.x;
+        const newZ = camera.position.z + movement.z;
+        
+        if (newX >= -5.5 && newX <= 11.5) {
+          camera.position.x = newX;
+        }
+        
+        if (newZ >= -4.5 && newZ <= 4.5) {
+          camera.position.z = newZ;
+        }
       }
+      
+      camera.position.y = 1.6;
 
       truckTimer += delta;
       if (truckTimer >= 12) {
