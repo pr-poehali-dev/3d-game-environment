@@ -111,6 +111,53 @@ export const useGameScene = ({
     rightWallPart2.receiveShadow = true;
     scene.add(rightWallPart2);
 
+    const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry(4, 3, 0.2), wallMaterial);
+    frontWallLeft.position.set(-4, 1.5, 5);
+    frontWallLeft.receiveShadow = true;
+    frontWallLeft.userData = { name: 'Передняя стена слева' };
+    scene.add(frontWallLeft);
+
+    const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry(4, 3, 0.2), wallMaterial);
+    frontWallRight.position.set(4, 1.5, 5);
+    frontWallRight.receiveShadow = true;
+    frontWallRight.userData = { name: 'Передняя стена справа' };
+    scene.add(frontWallRight);
+
+    const frontWallTop = new THREE.Mesh(new THREE.BoxGeometry(4, 0.8, 0.2), wallMaterial);
+    frontWallTop.position.set(0, 2.6, 5);
+    frontWallTop.receiveShadow = true;
+    frontWallTop.userData = { name: 'Передняя стена верх' };
+    scene.add(frontWallTop);
+
+    const doorFrameGeometry = new THREE.BoxGeometry(0.15, 2.4, 0.15);
+    const doorFrameMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
+    
+    const doorFrameLeft = new THREE.Mesh(doorFrameGeometry, doorFrameMaterial);
+    doorFrameLeft.position.set(-1.85, 1.2, 5);
+    doorFrameLeft.castShadow = true;
+    scene.add(doorFrameLeft);
+
+    const doorFrameRight = new THREE.Mesh(doorFrameGeometry, doorFrameMaterial);
+    doorFrameRight.position.set(1.85, 1.2, 5);
+    doorFrameRight.castShadow = true;
+    scene.add(doorFrameRight);
+
+    const doorFrameTop = new THREE.Mesh(new THREE.BoxGeometry(3.7, 0.15, 0.15), doorFrameMaterial);
+    doorFrameTop.position.set(0, 2.4, 5);
+    doorFrameTop.castShadow = true;
+    scene.add(doorFrameTop);
+
+    const doorGeometry = new THREE.BoxGeometry(3.5, 2.2, 0.1);
+    const doorMaterial = new THREE.MeshStandardMaterial({ 
+      color: 0x4a4a4a,
+      transparent: true,
+      opacity: 0.3
+    });
+    const door = new THREE.Mesh(doorGeometry, doorMaterial);
+    door.position.set(0, 1.1, 5);
+    door.userData = { name: 'Стеклянная дверь (вход)' };
+    scene.add(door);
+
     const curtainGeometry = new THREE.PlaneGeometry(1.8, 2.5);
     const curtainMaterial = new THREE.MeshStandardMaterial({ 
       color: 0x1a1a1a,
@@ -225,7 +272,7 @@ export const useGameScene = ({
     const roadMaterial = new THREE.MeshStandardMaterial({ color: 0x3a3a3a });
     const road = new THREE.Mesh(roadGeometry, roadMaterial);
     road.rotation.x = -Math.PI / 2;
-    road.position.set(3, 0, 20);
+    road.position.set(3, 0, 30);
     road.receiveShadow = true;
     road.userData = { name: 'Дорога' };
     scene.add(road);
@@ -235,13 +282,13 @@ export const useGameScene = ({
     
     const sidewalkLeft = new THREE.Mesh(sidewalkGeometry, sidewalkMaterial);
     sidewalkLeft.rotation.x = -Math.PI / 2;
-    sidewalkLeft.position.set(-2, 0.02, 20);
+    sidewalkLeft.position.set(-2, 0.02, 30);
     sidewalkLeft.receiveShadow = true;
     scene.add(sidewalkLeft);
 
     const sidewalkRight = new THREE.Mesh(sidewalkGeometry, sidewalkMaterial);
     sidewalkRight.rotation.x = -Math.PI / 2;
-    sidewalkRight.position.set(8.5, 0.02, 20);
+    sidewalkRight.position.set(8.5, 0.02, 30);
     sidewalkRight.receiveShadow = true;
     scene.add(sidewalkRight);
 
@@ -250,12 +297,12 @@ export const useGameScene = ({
     
     const lawnLeft = new THREE.Mesh(lawnGeometry, lawnMaterial);
     lawnLeft.rotation.x = -Math.PI / 2;
-    lawnLeft.position.set(-5.5, 0.01, 20);
+    lawnLeft.position.set(-5.5, 0.01, 30);
     scene.add(lawnLeft);
 
     const lawnRight = new THREE.Mesh(lawnGeometry, lawnMaterial);
     lawnRight.rotation.x = -Math.PI / 2;
-    lawnRight.position.set(11.5, 0.01, 20);
+    lawnRight.position.set(11.5, 0.01, 30);
     scene.add(lawnRight);
 
     const treeGeometry = new THREE.CylinderGeometry(0.3, 0.3, 3, 8);
@@ -273,12 +320,12 @@ export const useGameScene = ({
       leaves.position.y = 3.5;
       tree.add(leaves);
       
-      tree.position.set(-5.5, 0, 5 + i * 8);
+      tree.position.set(-5.5, 0, 15 + i * 8);
       tree.castShadow = true;
       scene.add(tree);
 
       const tree2 = tree.clone();
-      tree2.position.set(11.5, 0, 5 + i * 8);
+      tree2.position.set(11.5, 0, 15 + i * 8);
       scene.add(tree2);
     }
 
@@ -286,12 +333,12 @@ export const useGameScene = ({
     const buildingMaterial = new THREE.MeshStandardMaterial({ color: 0xd4af37 });
 
     const building1 = new THREE.Mesh(buildingGeometry, buildingMaterial);
-    building1.position.set(-5.5, 4, 15);
+    building1.position.set(-5.5, 4, 25);
     building1.castShadow = true;
     scene.add(building1);
 
     const building2 = new THREE.Mesh(buildingGeometry, buildingMaterial);
-    building2.position.set(-5.5, 4, 25);
+    building2.position.set(-5.5, 4, 35);
     building2.castShadow = true;
     scene.add(building2);
 
@@ -394,7 +441,7 @@ export const useGameScene = ({
       camera.position.add(velocity.multiplyScalar(moveSpeed * delta));
       camera.position.y = 1.6;
       camera.position.x = Math.max(-5.5, Math.min(11.5, camera.position.x));
-      camera.position.z = Math.max(-4.5, Math.min(25, camera.position.z));
+      camera.position.z = Math.max(-4.5, Math.min(4.5, camera.position.z));
 
       truckTimer += delta;
       if (truckTimer >= 12) {
