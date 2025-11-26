@@ -13,7 +13,7 @@ const Index = () => {
     if (!mountRef.current) return;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x87ceeb);
+    scene.background = new THREE.Color(0xd3d3d3);
 
     const camera = new THREE.PerspectiveCamera(
       75,
@@ -124,6 +124,58 @@ const Index = () => {
     poster.position.set(5.9, 1.5, 2);
     poster.userData = { name: 'Плакат на стене' };
     scene.add(poster);
+
+    const securityGateMaterial = new THREE.MeshStandardMaterial({ color: 0x4a4a4a });
+    
+    const leftGatePost1 = new THREE.Mesh(new THREE.BoxGeometry(0.4, 2.3, 0.15), securityGateMaterial);
+    leftGatePost1.position.set(3.5, 1.15, 3);
+    leftGatePost1.castShadow = true;
+    leftGatePost1.userData = { name: 'Турникет (левая стойка 1)' };
+    scene.add(leftGatePost1);
+
+    const leftGatePost2 = new THREE.Mesh(new THREE.BoxGeometry(0.15, 2.3, 0.4), securityGateMaterial);
+    leftGatePost2.position.set(3.25, 1.15, 3);
+    leftGatePost2.castShadow = true;
+    scene.add(leftGatePost2);
+
+    const rightGatePost1 = new THREE.Mesh(new THREE.BoxGeometry(0.4, 2.3, 0.15), securityGateMaterial);
+    rightGatePost1.position.set(-3.5, 1.15, 3);
+    rightGatePost1.castShadow = true;
+    rightGatePost1.userData = { name: 'Турникет (правая стойка 1)' };
+    scene.add(rightGatePost1);
+
+    const rightGatePost2 = new THREE.Mesh(new THREE.BoxGeometry(0.15, 2.3, 0.4), securityGateMaterial);
+    rightGatePost2.position.set(-3.25, 1.15, 3);
+    rightGatePost2.castShadow = true;
+    scene.add(rightGatePost2);
+
+    const textureLoader = new THREE.TextureLoader();
+    const entranceSignMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+    const entranceSign = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.2, 0.05), entranceSignMaterial);
+    entranceSign.position.set(0, 1.8, 3.5);
+    entranceSign.userData = { name: 'Примерочная (надпись)' };
+    scene.add(entranceSign);
+
+    const exitArrowGeometry = new THREE.ConeGeometry(0.15, 0.4, 3);
+    const exitArrowMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+    const exitArrow = new THREE.Mesh(exitArrowGeometry, exitArrowMaterial);
+    exitArrow.position.set(5, 1.6, 3.5);
+    exitArrow.rotation.z = -Math.PI / 2;
+    exitArrow.userData = { name: 'Стрелка выхода' };
+    scene.add(exitArrow);
+
+    const bluePosterTexture = textureLoader.load('https://cdn.poehali.dev/files/12ecfb23-88b7-4cb7-9acd-0b2c5fca274c.jpeg');
+    const bluePosterMaterial = new THREE.MeshStandardMaterial({ map: bluePosterTexture });
+    const bluePoster = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.6, 0.05), bluePosterMaterial);
+    bluePoster.position.set(-5.9, 1.5, 2);
+    bluePoster.userData = { name: 'Синий плакат OZON' };
+    scene.add(bluePoster);
+
+    const wallPosterMaterial = new THREE.MeshStandardMaterial({ color: 0x005aff });
+    const wallPoster = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.2, 0.05), wallPosterMaterial);
+    wallPoster.position.set(-5.9, 1.5, -2);
+    wallPoster.userData = { name: 'Синяя табличка на стене' };
+    scene.add(wallPoster);
 
     const velocity = new THREE.Vector3();
     const direction = new THREE.Vector3();
