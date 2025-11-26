@@ -8,6 +8,9 @@ const Index = () => {
   const [isLocked, setIsLocked] = useState(false);
   const [controls, setControls] = useState({ forward: false, backward: false, left: false, right: false });
   const [selectedObject, setSelectedObject] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const touchStartRef = useRef({ x: 0, y: 0 });
+  const lastTouchRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -223,10 +226,33 @@ const Index = () => {
       }
     };
 
+    const onTouchStart = (event: TouchEvent) => {
+      if (event.touches.length === 1) {
+        touchStartRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+        lastTouchRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+      }
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      if (event.touches.length === 1 && isLocked) {
+        const touch = event.touches[0];
+        const deltaX = touch.clientX - lastTouchRef.current.x;
+        const deltaY = touch.clientY - lastTouchRef.current.y;
+        
+        mouseX += deltaX * 0.003;
+        mouseY += deltaY * 0.003;
+        mouseY = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, mouseY));
+        
+        lastTouchRef.current = { x: touch.clientX, y: touch.clientY };
+      }
+    };
+
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('keydown', onKeyDown);
     document.addEventListener('keyup', onKeyUp);
     renderer.domElement.addEventListener('click', onClick);
+    renderer.domElement.addEventListener('touchstart', onTouchStart, { passive: true });
+    renderer.domElement.addEventListener('touchmove', onTouchMove, { passive: true });
 
     const clock = new THREE.Clock();
 
@@ -279,14 +305,25 @@ const Index = () => {
       document.removeEventListener('keydown', onKeyDown);
       document.removeEventListener('keyup', onKeyUp);
       renderer.domElement.removeEventListener('click', onClick);
+      renderer.domElement.removeEventListener('touchstart', onTouchStart);
+      renderer.domElement.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('resize', handleResize);
       mountRef.current?.removeChild(renderer.domElement);
     };
   }, [isLocked, controls]);
 
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+    };
+    checkMobile();
+  }, []);
+
   const handleLockPointer = () => {
     if (!isLocked) {
-      document.body.requestPointerLock();
+      if (!isMobile) {
+        document.body.requestPointerLock();
+      }
       setIsLocked(true);
     }
   };
@@ -311,18 +348,33 @@ const Index = () => {
           <Card className="p-8 max-w-md space-y-4 bg-[#1A1F2C] border-[#9b87f5]">
             <h1 className="text-3xl font-bold text-white text-center">3D Офис OZON</h1>
             <div className="space-y-2 text-gray-300">
-              <div className="flex items-center gap-2">
-                <Icon name="Move" size={20} className="text-[#9b87f5]" />
-                <span>WASD - движение</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Icon name="MousePointer2" size={20} className="text-[#9b87f5]" />
-                <span>Мышь - осмотр</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Icon name="Hand" size={20} className="text-[#9b87f5]" />
-                <span>Клик - взаимодействие</span>
-              </div>
+              {isMobile ? (
+                <>
+                  <div className="flex items-center gap-2">
+                    <Icon name="Hand" size={20} className="text-[#9b87f5]" />
+                    <span>Свайп - осмотр</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Icon name="Gamepad2" size={20} className="text-[#9b87f5]" />
+                    <span>Джойстик - движение</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2">
+                    <Icon name="Move" size={20} className="text-[#9b87f5]" />
+                    <span>WASD - движение</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Icon name="MousePointer2" size={20} className="text-[#9b87f5]" />
+                    <span>Мышь - осмотр</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Icon name="Hand" size={20} className="text-[#9b87f5]" />
+                    <span>Клик - взаимодействие</span>
+                  </div>
+                </>
+              )}
             </div>
             <button
               onClick={handleLockPointer}
@@ -367,6 +419,62 @@ const Index = () => {
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
         <div className="w-2 h-2 bg-white rounded-full opacity-50"></div>
       </div>
+
+      {isMobile && isLocked && (
+        <div className="absolute bottom-8 left-8 flex flex-col gap-4">
+          <div className="relative w-32 h-32">
+            <div className="absolute inset-0 rounded-full border-4 border-[#9b87f5]/30 bg-[#1A1F2C]/50" />
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+              <div className="w-16 h-16 rounded-full bg-[#9b87f5]/70 touch-none" 
+                onTouchStart={(e) => {
+                  const touch = e.touches[0];
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const centerX = rect.left + rect.width / 2;
+                  const centerY = rect.top + rect.height / 2;
+                  const deltaX = touch.clientX - centerX;
+                  const deltaY = touch.clientY - centerY;
+                  const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                  const maxDistance = 32;
+                  const normalizedDistance = Math.min(distance, maxDistance) / maxDistance;
+                  
+                  if (Math.abs(deltaY) > Math.abs(deltaX)) {
+                    if (deltaY < 0) {
+                      setControls(prev => ({ ...prev, forward: true }));
+                    } else {
+                      setControls(prev => ({ ...prev, backward: true }));
+                    }
+                  } else {
+                    if (deltaX < 0) {
+                      setControls(prev => ({ ...prev, left: true }));
+                    } else {
+                      setControls(prev => ({ ...prev, right: true }));
+                    }
+                  }
+                }}
+                onTouchMove={(e) => {
+                  const touch = e.touches[0];
+                  const rect = e.currentTarget.parentElement?.parentElement?.getBoundingClientRect();
+                  if (!rect) return;
+                  const centerX = rect.left + rect.width / 2;
+                  const centerY = rect.top + rect.height / 2;
+                  const deltaX = touch.clientX - centerX;
+                  const deltaY = touch.clientY - centerY;
+                  
+                  setControls({
+                    forward: deltaY < -20,
+                    backward: deltaY > 20,
+                    left: deltaX < -20,
+                    right: deltaX > 20
+                  });
+                }}
+                onTouchEnd={() => {
+                  setControls({ forward: false, backward: false, left: false, right: false });
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
