@@ -54,6 +54,10 @@ const Index = () => {
     setJoystickY(y);
   };
 
+  const handleStartGame = () => {
+    setIsLocked(true);
+  };
+
   return (
     <div className="relative w-full h-screen overflow-hidden">
       <div ref={mountRef} className="w-full h-full" />
@@ -62,6 +66,7 @@ const Index = () => {
         isLocked={isLocked}
         gameTime={gameTime}
         money={money}
+        onStartGame={handleStartGame}
       />
 
       {isLocked && (

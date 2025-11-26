@@ -1,13 +1,15 @@
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 
 interface GameUIProps {
   isLocked: boolean;
   gameTime: { hours: number; minutes: number };
   money: number;
+  onStartGame: () => void;
 }
 
-export const GameUI = ({ isLocked, gameTime, money }: GameUIProps) => {
+export const GameUI = ({ isLocked, gameTime, money, onStartGame }: GameUIProps) => {
   return (
     <>
       {isLocked && (
@@ -65,9 +67,6 @@ export const GameUI = ({ isLocked, gameTime, money }: GameUIProps) => {
           <Card className="p-6 bg-[#1A1F2C]/95 border-[#9b87f5]">
             <div className="text-center space-y-4">
               <h2 className="text-2xl font-bold text-white">🏢 OZON Симулятор ПВЗ</h2>
-              <p className="text-gray-300">
-                Нажмите на экран, чтобы начать
-              </p>
               <div className="text-sm text-gray-400 space-y-2">
                 <div className="bg-[#9b87f5]/20 rounded p-2">
                   <p className="font-semibold text-[#9b87f5]">🕹️ Джойстик слева</p>
@@ -78,6 +77,12 @@ export const GameUI = ({ isLocked, gameTime, money }: GameUIProps) => {
                   <p className="text-xs">Осмотр вокруг</p>
                 </div>
               </div>
+              <Button 
+                onClick={onStartGame}
+                className="w-full bg-[#9b87f5] hover:bg-[#8b77e5] text-white font-bold py-3 text-lg"
+              >
+                Начать
+              </Button>
             </div>
           </Card>
         </div>

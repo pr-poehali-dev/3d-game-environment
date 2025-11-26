@@ -26,12 +26,6 @@ export const useGameControls = ({
   useEffect(() => {
     if (!rendererRef.current) return;
 
-    const onClick = () => {
-      if (!isLocked) {
-        setIsLocked(true);
-      }
-    };
-
     const onTouchStart = (event: TouchEvent) => {
       if (event.touches.length === 1) {
         const touch = event.touches[0];
@@ -58,18 +52,16 @@ export const useGameControls = ({
       }
     };
 
-    rendererRef.current.addEventListener('click', onClick);
     rendererRef.current.addEventListener('touchstart', onTouchStart, { passive: true });
     rendererRef.current.addEventListener('touchmove', onTouchMove, { passive: true });
 
     return () => {
       if (rendererRef.current) {
-        rendererRef.current.removeEventListener('click', onClick);
         rendererRef.current.removeEventListener('touchstart', onTouchStart);
         rendererRef.current.removeEventListener('touchmove', onTouchMove);
       }
     };
-  }, [isLocked, setIsLocked, mouseXRef, mouseYRef, rendererRef]);
+  }, [isLocked, mouseXRef, mouseYRef, rendererRef]);
 
   useEffect(() => {
     if (isLocked) {
