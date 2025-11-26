@@ -54,11 +54,7 @@ export const GameUI = ({ isLocked, gameTime, money, onStartGame }: GameUIProps) 
             </Card>
           </div>
 
-          <div className="absolute top-14 left-1/2 transform -translate-x-1/2">
-            <Card className="px-3 py-1 bg-[#1A1F2C]/60 border-[#9b87f5]/30">
-              <p className="text-white text-xs text-center">Правая часть экрана - осмотр</p>
-            </Card>
-          </div>
+
         </>
       )}
 

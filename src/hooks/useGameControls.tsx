@@ -24,54 +24,55 @@ export const useGameControls = ({
   const lastTouchRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
-    if (!rendererRef.current) return;
+    if (!isLocked) return;
 
     const onTouchStart = (event: TouchEvent) => {
-      if (event.touches.length === 1) {
-        const touch = event.touches[0];
-        lastTouchRef.current = { x: touch.clientX, y: touch.clientY };
-      }
+      const touches = Array.from(event.touches);
+      touches.forEach(touch => {
+        const x = touch.clientX;
+        if (x > window.innerWidth * 0.5) {
+          lastTouchRef.current = { x: touch.clientX, y: touch.clientY };
+        }
+      });
     };
 
     const onTouchMove = (event: TouchEvent) => {
-      if (event.touches.length === 1 && isLocked) {
-        const touch = event.touches[0];
+      event.preventDefault();
+      
+      const touches = Array.from(event.touches);
+      touches.forEach(touch => {
         const x = touch.clientX;
         const y = touch.clientY;
         
-        if (x > window.innerWidth * 0.4) {
+        if (x > window.innerWidth * 0.5) {
           const deltaX = x - lastTouchRef.current.x;
           const deltaY = y - lastTouchRef.current.y;
           
-          mouseXRef.current += deltaX * 0.008;
-          mouseYRef.current += deltaY * 0.008;
+          mouseXRef.current += deltaX * 0.003;
+          mouseYRef.current += deltaY * 0.003;
           mouseYRef.current = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, mouseYRef.current));
+          
+          lastTouchRef.current = { x, y };
         }
-        
-        lastTouchRef.current = { x, y };
-      }
+      });
     };
 
-    rendererRef.current.addEventListener('touchstart', onTouchStart, { passive: true });
-    rendererRef.current.addEventListener('touchmove', onTouchMove, { passive: true });
+    document.addEventListener('touchstart', onTouchStart, { passive: false });
+    document.addEventListener('touchmove', onTouchMove, { passive: false });
 
     return () => {
-      if (rendererRef.current) {
-        rendererRef.current.removeEventListener('touchstart', onTouchStart);
-        rendererRef.current.removeEventListener('touchmove', onTouchMove);
-      }
+      document.removeEventListener('touchstart', onTouchStart);
+      document.removeEventListener('touchmove', onTouchMove);
     };
-  }, [isLocked, mouseXRef, mouseYRef, rendererRef]);
+  }, [isLocked, mouseXRef, mouseYRef]);
 
   useEffect(() => {
-    if (isLocked) {
-      const threshold = 0.1;
-      setControls({
-        forward: joystickY > threshold,
-        backward: joystickY < -threshold,
-        left: joystickX < -threshold,
-        right: joystickX > threshold
-      });
-    }
-  }, [joystickX, joystickY, isLocked, setControls]);
+    const threshold = 0.05;
+    setControls({
+      forward: joystickY > threshold,
+      backward: joystickY < -threshold,
+      left: joystickX < -threshold,
+      right: joystickX > threshold
+    });
+  }, [joystickX, joystickY, setControls]);
 };

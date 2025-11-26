@@ -112,24 +112,7 @@ export const MobileControls = ({ onJoystickMove }: MobileControlsProps) => {
         </div>
       </div>
 
-      <div className="absolute bottom-6 right-6 pointer-events-none z-40">
-        <div className="relative w-32 h-32 border-4 border-dashed border-[#9b87f5]/40 rounded-2xl backdrop-blur-sm bg-gradient-to-br from-[#1A1F2C]/30 to-[#9b87f5]/10">
-          <div className="absolute inset-0 flex items-center justify-center flex-col gap-1">
-            <Icon name="Hand" size={28} className="text-white/50" />
-            <div className="flex gap-1">
-              <div className="w-1 h-1 rounded-full bg-white/30"></div>
-              <div className="w-1 h-1 rounded-full bg-white/30"></div>
-              <div className="w-1 h-1 rounded-full bg-white/30"></div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
-          <div className="bg-[#1A1F2C]/80 px-2 py-1 rounded text-xs text-white border border-[#9b87f5]/50">
-            Осмотр
-          </div>
-        </div>
-      </div>
+
     </>
   );
 };
