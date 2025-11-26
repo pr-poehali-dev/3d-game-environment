@@ -35,7 +35,9 @@ const Index = () => {
     mouseYRef,
     gameTime,
     setGameTime,
-    setMoney
+    setMoney,
+    joystickX,
+    joystickY
   });
 
   useGameControls({

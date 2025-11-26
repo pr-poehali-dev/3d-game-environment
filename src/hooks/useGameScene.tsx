@@ -10,6 +10,8 @@ interface GameSceneProps {
   gameTime: { hours: number; minutes: number };
   setGameTime: React.Dispatch<React.SetStateAction<{ hours: number; minutes: number }>>;
   setMoney: React.Dispatch<React.SetStateAction<number>>;
+  joystickX: number;
+  joystickY: number;
 }
 
 export const useGameScene = ({
@@ -20,7 +22,9 @@ export const useGameScene = ({
   mouseYRef,
   gameTime,
   setGameTime,
-  setMoney
+  setMoney,
+  joystickX,
+  joystickY
 }: GameSceneProps) => {
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -454,9 +458,8 @@ export const useGameScene = ({
       camera.rotation.y = -mouseXRef.current;
       camera.rotation.x = -mouseYRef.current;
 
-      direction.z = Number(controls.forward) - Number(controls.backward);
-      direction.x = Number(controls.right) - Number(controls.left);
-      direction.normalize();
+      const inputX = joystickX;
+      const inputZ = joystickY;
 
       const forward = new THREE.Vector3(0, 0, -1);
       forward.applyQuaternion(camera.quaternion);
@@ -469,23 +472,20 @@ export const useGameScene = ({
       right.normalize();
 
       velocity.set(0, 0, 0);
-      if (direction.z !== 0) velocity.add(forward.multiplyScalar(direction.z));
-      if (direction.x !== 0) velocity.add(right.multiplyScalar(direction.x));
+      if (Math.abs(inputZ) > 0.01) {
+        velocity.add(forward.clone().multiplyScalar(inputZ));
+      }
+      if (Math.abs(inputX) > 0.01) {
+        velocity.add(right.clone().multiplyScalar(inputX));
+      }
       
-      if (velocity.length() > 0) {
-        velocity.normalize();
-        const movement = velocity.multiplyScalar(moveSpeed * delta);
+      if (velocity.length() > 0.01) {
+        const speed = moveSpeed * delta;
+        camera.position.x += velocity.x * speed;
+        camera.position.z += velocity.z * speed;
         
-        const newX = camera.position.x + movement.x;
-        const newZ = camera.position.z + movement.z;
-        
-        if (newX >= -5.5 && newX <= 11.5) {
-          camera.position.x = newX;
-        }
-        
-        if (newZ >= -4.5 && newZ <= 4.5) {
-          camera.position.z = newZ;
-        }
+        camera.position.x = Math.max(-5.5, Math.min(11.5, camera.position.x));
+        camera.position.z = Math.max(-4.5, Math.min(4.5, camera.position.z));
       }
       
       camera.position.y = 1.6;
