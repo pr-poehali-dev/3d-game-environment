@@ -246,12 +246,46 @@ export const useGameScene = ({
     receptionDesk.userData = { name: 'Reception' };
     scene.add(receptionDesk);
 
-    const ozonTextGeometry = new THREE.BoxGeometry(1.5, 0.4, 0.1);
-    const ozonTextMaterial = new THREE.MeshStandardMaterial({ color: 0x0066ff });
-    const ozonText = new THREE.Mesh(ozonTextGeometry, ozonTextMaterial);
-    ozonText.position.set(0, 1.8, -4.9);
-    ozonText.userData = { name: 'OZON надпись' };
-    scene.add(ozonText);
+    const ozonSignBackground = new THREE.Mesh(
+      new THREE.BoxGeometry(2.5, 0.6, 0.1),
+      new THREE.MeshStandardMaterial({ color: 0x0066ff })
+    );
+    ozonSignBackground.position.set(0, 2.3, -4.9);
+    scene.add(ozonSignBackground);
+
+    const createLetter = (text: string, xPos: number) => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 128;
+      canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 100px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, 64, 64);
+      }
+      const texture = new THREE.CanvasTexture(canvas);
+      const material = new THREE.MeshStandardMaterial({ 
+        map: texture,
+        emissive: 0xffffff,
+        emissiveIntensity: 0.8,
+        transparent: true
+      });
+      const letterMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.35, 0.4),
+        material
+      );
+      letterMesh.position.set(xPos, 2.3, -4.85);
+      return letterMesh;
+    };
+
+    const letters = ['O', 'z', 'o', 'n'];
+    const startX = -0.6;
+    const spacing = 0.4;
+    letters.forEach((letter, i) => {
+      scene.add(createLetter(letter, startX + i * spacing));
+    });
 
     const chairGeometry = new THREE.BoxGeometry(0.6, 0.5, 0.6);
     const chairMaterial = new THREE.MeshStandardMaterial({ color: 0x4169e1 });
@@ -438,10 +472,13 @@ export const useGameScene = ({
       if (direction.z !== 0) velocity.add(forward.multiplyScalar(direction.z));
       if (direction.x !== 0) velocity.add(right.multiplyScalar(direction.x));
       
-      camera.position.add(velocity.multiplyScalar(moveSpeed * delta));
-      camera.position.y = 1.6;
-      camera.position.x = Math.max(-5.5, Math.min(11.5, camera.position.x));
-      camera.position.z = Math.max(-4.5, Math.min(4.5, camera.position.z));
+      const newPosition = camera.position.clone().add(velocity.multiplyScalar(moveSpeed * delta));
+      newPosition.y = 1.6;
+      
+      if (newPosition.x >= -5.5 && newPosition.x <= 11.5 && 
+          newPosition.z >= -4.5 && newPosition.z <= 4.5) {
+        camera.position.copy(newPosition);
+      }
 
       truckTimer += delta;
       if (truckTimer >= 12) {
